@@ -1,0 +1,98 @@
+import axios from 'axios';
+
+// 创建一个带有认证token的请求配置
+const getConfig = (token) => {
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+};
+
+// 获取所有任务
+export const getTasks = async (token) => {
+  try {
+    const { data } = await axios.get('/api/tasks', getConfig(token));
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '获取任务失败'
+    );
+  }
+};
+
+// 创建新任务
+export const createTask = async (taskData, token) => {
+  try {
+    const { data } = await axios.post('/api/tasks', taskData, getConfig(token));
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '创建任务失败'
+    );
+  }
+};
+
+// 获取单个任务
+export const getTaskById = async (id, token) => {
+  try {
+    const { data } = await axios.get(`/api/tasks/${id}`, getConfig(token));
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '获取任务详情失败'
+    );
+  }
+};
+
+// 更新任务
+export const updateTask = async (id, taskData, token) => {
+  try {
+    const { data } = await axios.put(`/api/tasks/${id}`, taskData, getConfig(token));
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '更新任务失败'
+    );
+  }
+};
+
+// 删除任务
+export const deleteTask = async (id, token) => {
+  try {
+    const { data } = await axios.delete(`/api/tasks/${id}`, getConfig(token));
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '删除任务失败'
+    );
+  }
+};
+
+// 完成任务
+export const completeTask = async (id, token) => {
+  try {
+    const { data } = await axios.put(
+      `/api/tasks/${id}`,
+      { status: '已完成' },
+      getConfig(token)
+    );
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '完成任务失败'
+    );
+  }
+};
