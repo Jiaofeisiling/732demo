@@ -23,6 +23,20 @@ export const getTasks = async (token) => {
   }
 };
 
+// 获取已装备的任务
+export const getEquippedTasks = async (token) => {
+  try {
+    const { data } = await axios.get('/api/tasks/equipped', getConfig(token));
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '获取已装备任务失败'
+    );
+  }
+};
+
 // 创建新任务
 export const createTask = async (taskData, token) => {
   try {
@@ -93,6 +107,42 @@ export const completeTask = async (id, token) => {
       error.response && error.response.data.message
         ? error.response.data.message
         : '完成任务失败'
+    );
+  }
+};
+
+// 装备任务到任务槽
+export const equipTask = async (id, slotPosition, token) => {
+  try {
+    const { data } = await axios.put(
+      `/api/tasks/${id}/equip`,
+      { slotPosition },
+      getConfig(token)
+    );
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '装备任务失败'
+    );
+  }
+};
+
+// 卸下已装备的任务
+export const unequipTask = async (id, token) => {
+  try {
+    const { data } = await axios.put(
+      `/api/tasks/${id}/unequip`,
+      {},
+      getConfig(token)
+    );
+    return data;
+  } catch (error) {
+    throw new Error(
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : '卸下任务失败'
     );
   }
 };
