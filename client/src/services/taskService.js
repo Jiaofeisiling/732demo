@@ -40,7 +40,27 @@ export const getEquippedTasks = async (token) => {
 // 创建新任务
 export const createTask = async (taskData, token) => {
   try {
-    const { data } = await axios.post('/api/tasks', taskData, getConfig(token));
+    // 先调用卡片消耗接口
+    const consumeResponse = await axios.post(
+      '/api/cards/consume',
+      {
+        cardId: taskData.cardId,
+        taskData: taskData
+      },
+      getConfig(token)
+    );
+
+    if (!consumeResponse.data.success) {
+      throw new Error(consumeResponse.data.error || '卡片消耗失败');
+    }
+
+    // 使用处理后的任务数据创建任务
+    const { data } = await axios.post(
+      '/api/tasks', 
+      consumeResponse.data.processedTask,
+      getConfig(token)
+    );
+    
     return data;
   } catch (error) {
     throw new Error(

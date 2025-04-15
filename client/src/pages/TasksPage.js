@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Navbar from '../components/Navbar';
 import TaskCard from '../components/TaskCard';
-import TaskForm from '../components/TaskForm';
+import CreateTaskModal from '../components/CreateTaskModal';
 import DailyTaskSlots from '../components/DailyTaskSlots';
 import TaskChain from '../components/TaskChain';
 import TaskRepository from '../components/TaskRepository';
@@ -25,6 +25,7 @@ const TasksPage = () => {
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [createSlotIndex, setCreateSlotIndex] = useState(-1);
   const [activeTab, setActiveTab] = useState('daily'); // 'daily', 'longterm', 'repository'
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -72,8 +73,15 @@ const TasksPage = () => {
         showSuccess('任务已更新');
       } else {
         // 创建新任务
-        await createTask(formData, user.token);
-        showSuccess('任务已创建');
+        const response = await createTask(formData, user.token);
+        
+        // 如果是从任务槽创建，直接装备到对应槽位
+        if (formData.fromSlot && formData.slotIndex >= 0) {
+          await equipTask(response._id, formData.slotIndex, user.token);
+          showSuccess('任务已创建并装备到任务槽');
+        } else {
+          showSuccess('任务已创建并存储到仓库');
+        }
       }
       
       // 重新获取任务列表
@@ -81,12 +89,19 @@ const TasksPage = () => {
       
       setShowForm(false);
       setEditingTask(null);
+      setCreateSlotIndex(-1);
     } catch (error) {
       setError(editingTask ? '更新任务失败' : '创建任务失败');
       console.error(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // 处理从任务槽创建任务
+  const handleCreateFromSlot = (slotIndex) => {
+    setCreateSlotIndex(slotIndex);
+    setShowForm(true);
   };
 
   // 处理编辑任务
@@ -210,6 +225,7 @@ const TasksPage = () => {
               onEdit={handleEdit}
               onUnequip={handleUnequip}
               onDrop={handleDropToSlot}
+              onCreateTask={handleCreateFromSlot}
             />
             
             <TaskRepository 
@@ -253,15 +269,13 @@ const TasksPage = () => {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">我的任务</h1>
           <button
-            onClick={() => {
-              setShowForm(!showForm);
-              if (!showForm) {
-                setEditingTask(null);
-              }
-            }}
-            className="btn-primary"
+            onClick={() => setShowForm(true)}
+            className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center space-x-2"
           >
-            {showForm ? '取消' : '创建新任务'}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            <span>创建新任务</span>
           </button>
         </div>
 
@@ -277,18 +291,19 @@ const TasksPage = () => {
           </div>
         )}
 
-        {/* 任务表单 */}
-        {showForm && (
-          <TaskForm 
-            onSubmit={handleSubmit}
-            initialData={editingTask}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingTask(null);
-            }}
-            loading={loading}
-          />
-        )}
+        {/* 创建任务模态框 */}
+        <CreateTaskModal
+          isOpen={showForm}
+          onClose={() => {
+            setShowForm(false);
+            setEditingTask(null);
+            setCreateSlotIndex(-1);
+          }}
+          onSubmit={handleSubmit}
+          loading={loading}
+          initialData={editingTask}
+          slotIndex={createSlotIndex}
+        />
 
         {/* 标签导航 */}
         <div className="border-b border-gray-200 mb-6">

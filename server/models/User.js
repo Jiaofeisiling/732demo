@@ -38,6 +38,24 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // 每日卡片配额
+    dailyCards: {
+      blank: {
+        type: Number,
+        default: 3, // 默认每天3张空白卡片
+      },
+      lastIssued: {
+        type: Date,
+        default: null, // 上次发放日期
+      },
+    },
+    // 卡片库存引用
+    cardInventory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Card',
+      },
+    ],
   },
   {
     timestamps: true, // 自动添加createdAt和updatedAt字段

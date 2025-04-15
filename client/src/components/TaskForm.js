@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import CardSelector from './CardSelector';
+import AuthContext from '../context/AuthContext';
 
 // 任务表单组件
 const TaskForm = ({ 
@@ -8,6 +10,8 @@ const TaskForm = ({
   loading = false
 }) => {
   // 表单数据
+  const { user } = useContext(AuthContext);
+  const [selectedCard, setSelectedCard] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -15,9 +19,10 @@ const TaskForm = ({
     priority: '中',
     category: '默认',
     dueDate: '',
-    experienceReward: 10,
-    goldReward: 5,
-    subTasks: []
+    baseExperience: 10,
+    baseGold: 5,
+    subTasks: [],
+    cardId: ''
   });
 
   // 子任务表单
@@ -38,7 +43,8 @@ const TaskForm = ({
         category: initialData.category || '默认',
         dueDate: initialData.dueDate ? new Date(initialData.dueDate).toISOString().split('T')[0] : '',
         experienceReward: initialData.experienceReward || 10,
-        goldReward: initialData.goldReward || 5,
+      baseGold: initialData.baseGold || 5,
+      cardId: initialData.cardUsed || '',
         subTasks: initialData.subTasks || []
       });
     }
@@ -128,12 +134,7 @@ const TaskForm = ({
   };
 
   return (
-    <div className="card mb-8">
-      <h2 className="text-lg font-semibold mb-4">
-        {initialData ? '编辑任务' : '创建新任务'}
-      </h2>
-      
-      <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           {/* 任务标题 */}
           <div>
@@ -215,35 +216,15 @@ const TaskForm = ({
             />
           </div>
           
-          {/* 奖励 */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                经验值奖励
-              </label>
-              <input
-                type="number"
-                name="experienceReward"
-                value={formData.experienceReward}
-                onChange={handleInputChange}
-                min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                金币奖励
-              </label>
-              <input
-                type="number"
-                name="goldReward"
-                value={formData.goldReward}
-                onChange={handleInputChange}
-                min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
+          {/* 卡片选择器 */}
+          <div className="col-span-2">
+            <CardSelector 
+              onSelect={(card) => {
+                setSelectedCard(card);
+                setFormData({...formData, cardId: card._id});
+              }}
+              selectedCard={selectedCard}
+            />
           </div>
         </div>
         
@@ -333,24 +314,23 @@ const TaskForm = ({
         )}
         
         {/* 提交按钮 */}
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-2 mt-6">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
           >
             取消
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+            className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
             disabled={loading}
           >
             {loading ? '处理中...' : initialData ? '更新任务' : '创建任务'}
           </button>
         </div>
-      </form>
-    </div>
+    </form>
   );
 };
 

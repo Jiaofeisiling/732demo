@@ -19,29 +19,36 @@ const getTasks = async (req, res) => {
 // @access  Private
 const createTask = async (req, res) => {
   try {
-    const { 
-      title, 
-      description, 
-      type, 
-      priority, 
-      category,
-      dueDate, 
-      experienceReward, 
-      goldReward,
-      subTasks 
-    } = req.body;
+    // 先调用卡片消耗API
+    const cardResponse = await fetch(`${process.env.API_URL}/api/cards/consume`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${req.cookies.token}`
+      },
+      body: JSON.stringify({
+        cardId: req.body.cardId,
+        taskData: req.body
+      })
+    });
 
+    const cardData = await cardResponse.json();
+    
+    if (!cardData.success) {
+      return res.status(400).json({ message: cardData.error || '卡片消耗失败' });
+    }
+
+    // 使用处理后的任务数据创建任务
     const task = await Task.create({
       user: req.user._id,
-      title,
-      description,
-      type: type || '短期',
-      priority,
-      category: category || '默认',
-      dueDate,
-      experienceReward,
-      goldReward,
-      subTasks: subTasks || [],
+      ...cardData.processedTask,
+      subTasks: req.body.subTasks || [],
+    });
+
+    // 更新用户卡片库存
+    await User.findByIdAndUpdate(req.user._id, {
+      $inc: { 'dailyCards.blank': -1 },
+      $pull: { cardInventory: req.body.cardId }
     });
 
     res.status(201).json(task);

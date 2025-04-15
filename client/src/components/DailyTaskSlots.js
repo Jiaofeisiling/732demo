@@ -8,7 +8,8 @@ const DailyTaskSlots = ({
   onDelete, 
   onEdit, 
   onUnequip,
-  onDrop
+  onDrop,
+  onCreateTask
 }) => {
   // 创建3个任务槽
   const [slots, setSlots] = useState([null, null, null]);
@@ -72,10 +73,13 @@ const DailyTaskSlots = ({
             isEquipped={true}
           />
         ) : (
-          <div className="text-center text-gray-400">
+          <button
+            onClick={() => onCreateTask(index)}
+            className="w-full h-full flex flex-col items-center justify-center text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors group"
+          >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
-              className="h-12 w-12 mx-auto mb-2" 
+              className="h-12 w-12 mb-2 transform group-hover:scale-110 transition-transform" 
               fill="none" 
               viewBox="0 0 24 24" 
               stroke="currentColor"
@@ -87,8 +91,11 @@ const DailyTaskSlots = ({
                 d="M12 4v16m8-8H4" 
               />
             </svg>
-            <p>将任务拖放到此处</p>
-          </div>
+            <p>点击创建新任务</p>
+            <p className="text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              或拖放现有任务到此处
+            </p>
+          </button>
         )}
       </div>
     );

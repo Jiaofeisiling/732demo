@@ -28,6 +28,19 @@ const taskSchema = new mongoose.Schema(
       required: true,
       ref: 'User', // 关联到User模型
     },
+    cardUsed: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Card',
+      required: [true, '必须指定使用的卡片']
+    },
+    baseExperience: {
+      type: Number,
+      default: 10
+    },
+    baseGold: {
+      type: Number,
+      default: 5
+    },
     title: {
       type: String,
       required: [true, '请提供任务标题'],
