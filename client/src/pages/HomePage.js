@@ -1,156 +1,150 @@
-import React, { useContext } from 'react';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import AuthContext from '../context/AuthContext';
+import { SparklesIcon, ChartBarIcon, BookOpenIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import LoginForm from '../components/LoginForm';
+import RegisterForm from '../components/RegisterForm';
 
 const HomePage = () => {
-  const { user } = useContext(AuthContext);
+  const [activeTab, setActiveTab] = useState('login');
+
+  const features = [
+    {
+      name: '任务游戏化',
+      description: '将待办事项变成可收集的卡牌',
+      icon: SparklesIcon,
+    },
+    {
+      name: '进度追踪',
+      description: '可视化你的成就成长轨迹',
+      icon: ChartBarIcon,
+    },
+    {
+      name: '知识管理',
+      description: '建立你的数字任务图书馆',
+      icon: BookOpenIcon,
+    },
+  ];
 
   return (
-    <div>
-      <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
-            Demo Example
-          </h1>
-          <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
-            一个基于MERN技术栈的游戏化任务管理系统，帮助你更有效地管理学习和生活任务。
-          </p>
-          
-          <div className="mt-8 flex justify-center">
-            {user ? (
-              <Link
-                to="/dashboard"
-                className="btn-primary inline-flex items-center"
-              >
-                进入仪表盘
-                <svg
-                  className="ml-2 -mr-1 w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+      {/* 导航栏 */}
+      <nav className="fixed w-full bg-black/30 backdrop-blur-md z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex-shrink-0 flex items-center">
+              <span className="text-2xl font-bold text-white">TaskMaster</span>
+            </div>
+            <div className="flex space-x-4">
+              <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md">
+                登录
               </Link>
-            ) : (
-              <div className="space-x-4">
-                <Link to="/login" className="btn-primary">
-                  登录
-                </Link>
-                <Link to="/register" className="btn-secondary">
-                  注册
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-20">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
-            主要功能
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="card">
-              <div className="text-primary-600 text-3xl mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-12 w-12"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">任务管理</h3>
-              <p className="text-gray-600">
-                创建、编辑和删除任务，设置优先级和截止日期，跟踪任务完成情况。
-              </p>
-            </div>
-
-            <div className="card">
-              <div className="text-primary-600 text-3xl mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-12 w-12"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">游戏化激励</h3>
-              <p className="text-gray-600">
-                完成任务获得经验值和金币奖励，提高学习和工作的积极性。
-              </p>
-            </div>
-
-            <div className="card">
-              <div className="text-primary-600 text-3xl mb-4">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-12 w-12"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">AI辅助</h3>
-              <p className="text-gray-600">
-                利用人工智能技术，智能分析用户数据，提供个性化的任务管理建议。
-              </p>
+              <Link 
+                to="/register" 
+                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-full transition-all"
+              >
+                立即开始
+              </Link>
             </div>
           </div>
         </div>
+      </nav>
 
-        <div className="mt-20 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            技术栈
-          </h2>
-          <div className="flex flex-wrap justify-center gap-4 text-gray-600">
-            <span className="px-4 py-2 bg-white rounded-full shadow-sm">MongoDB</span>
-            <span className="px-4 py-2 bg-white rounded-full shadow-sm">Express.js</span>
-            <span className="px-4 py-2 bg-white rounded-full shadow-sm">React</span>
-            <span className="px-4 py-2 bg-white rounded-full shadow-sm">Node.js</span>
-            <span className="px-4 py-2 bg-white rounded-full shadow-sm">JWT</span>
-            <span className="px-4 py-2 bg-white rounded-full shadow-sm">Tailwind CSS</span>
+      {/* 主要内容 */}
+      <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* 左侧文字内容 */}
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-12"
+            >
+              <h1 className="text-5xl font-bold text-white leading-tight">
+                把你的待办事项
+                <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                  变成可收集的卡牌
+                </span>
+              </h1>
+              <p className="text-xl text-gray-300">
+                通过独特的卡牌收集系统，让任务管理变得像游戏一样有趣。完成目标、解锁成就、打造你的专属任务卡册。
+              </p>
+              
+              {/* 功能亮点 */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {features.map((feature) => (
+                  <motion.div 
+                    key={feature.name}
+                    whileHover={{ scale: 1.05 }}
+                    className="p-6 bg-white/10 backdrop-blur-lg rounded-xl"
+                  >
+                    <feature.icon className="h-8 w-8 text-purple-400" />
+                    <h3 className="mt-4 text-lg font-semibold text-white">{feature.name}</h3>
+                    <p className="mt-2 text-gray-300">{feature.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* CTA按钮 */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="inline-block"
+              >
+                <Link 
+                  to="/register" 
+                  className="flex items-center space-x-3 bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-full text-lg"
+                >
+                  <span>立即开始旅程</span>
+                  <ArrowRightIcon className="h-5 w-5" />
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* 右侧交互展示 */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-purple-500/30 blur-3xl rounded-full" />
+              <div className="relative p-8 bg-white/5 backdrop-blur-xl rounded-3xl shadow-2xl">
+                <div className="border border-white/10 rounded-2xl p-6">
+                  <div className="flex space-x-4 mb-6">
+                    <button
+                      onClick={() => setActiveTab('login')}
+                      className={`px-6 py-3 rounded-xl ${
+                        activeTab === 'login' 
+                          ? 'bg-purple-600 text-white' 
+                          : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                      }`}
+                    >
+                      登录
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('register')}
+                      className={`px-6 py-3 rounded-xl ${
+                        activeTab === 'register' 
+                          ? 'bg-purple-600 text-white' 
+                          : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                      }`}
+                    >
+                      注册
+                    </button>
+                  </div>
+                  
+                  {activeTab === 'login' ? (
+                    <LoginForm isEmbedded={true} />
+                  ) : (
+                    <RegisterForm isEmbedded={true} />
+                  )}
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
-
-      <footer className="bg-gray-100 py-8 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500">
-            &copy; {new Date().getFullYear()} 任务管理系统 | MERN架构演示项目
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };

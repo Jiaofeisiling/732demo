@@ -1,219 +1,233 @@
-# MERN 架构演示 - 任务管理系统
+# 游戏化任务管理系统实现文档
 
-这是一个基于MERN (MongoDB, Express.js, React, Node.js) 技术栈的任务管理系统演示项目。该项目展示了MERN架构的核心组件和它们之间的交互方式，同时集成了JWT认证、Tailwind CSS和游戏化元素。
+本文档详细描述了游戏化任务管理系统的实现过程，包括后端和前端的修改。
 
+## 功能概述
 
-## 详细项目结构
+本系统实现了以下功能：
 
-```
-732demo/
-├── client/                  # 前端React应用
-│   ├── public/              # 静态资源
-│   │   ├── index.html       # HTML入口文件
-│   │   └── manifest.json    # PWA配置
-│   ├── src/                 # React源代码
-│   │   ├── components/      # 可复用组件
-│   │   │   ├── Navbar.js    # 导航栏组件
-│   │   │   └── TaskCard.js  # 任务卡片组件
-│   │   ├── pages/           # 页面组件
-│   │   │   ├── HomePage.js          # 首页
-│   │   │   ├── LoginPage.js         # 登录页
-│   │   │   ├── RegisterPage.js      # 注册页
-│   │   │   ├── DashboardPage.js     # 仪表盘页
-│   │   │   ├── TasksPage.js         # 任务列表页
-│   │   │   ├── ProfilePage.js       # 个人资料页
-│   │   │   └── NotFoundPage.js      # 404页面
-│   │   ├── context/         # 上下文(用于状态管理)
-│   │   │   └── AuthContext.js       # 认证上下文
-│   │   ├── services/        # API服务
-│   │   │   └── taskService.js       # 任务API服务
-│   │   ├── App.js           # 主应用组件
-│   │   ├── index.js         # 入口文件
-│   │   └── index.css        # 全局样式(包含Tailwind指令)
-│   ├── package.json         # 前端依赖
-│   └── tailwind.config.js   # Tailwind配置
-│
-├── server/                  # 后端Node.js/Express应用
-│   ├── config/              # 配置文件
-│   │   └── db.js            # MongoDB连接配置
-│   ├── controllers/         # 控制器
-│   │   ├── userController.js  # 用户相关控制器
-│   │   └── taskController.js  # 任务相关控制器
-│   ├── middleware/          # 中间件
-│   │   └── auth.js          # JWT认证中间件
-│   ├── models/              # MongoDB模型
-│   │   ├── User.js          # 用户模型
-│   │   └── Task.js          # 任务模型
-│   ├── routes/              # API路由
-│   │   ├── userRoutes.js    # 用户相关路由
-│   │   └── taskRoutes.js    # 任务相关路由
-│   ├── utils/               # 工具函数
-│   ├── server.js            # 服务器入口文件
-│   └── package.json         # 后端依赖
-│
-└── README.md                # 项目说明
-```
+1. **任务卡创建与分类**
+   - 支持创建短期任务和长期任务
+   - 任务可以设置类别、优先级等属性
+   - 长期任务支持添加子任务
 
-## 技术栈详解
+2. **任务卡展示与动态管理**
+   - 每日任务槽界面，限制为3个任务槽
+   - 长期任务链视图，展示任务分解后的各个阶段
+   - 任务状态显示（待办、进行中、已完成、过期）
 
-### 后端技术
-- **MongoDB**: NoSQL数据库，用于存储用户数据、任务等
-  - 使用Mongoose ODM进行数据建模和验证
-  - 实现了用户和任务的数据模型
-- **Express.js**: Node.js Web应用框架，处理后端API
-  - RESTful API设计
-  - 中间件架构
-  - 错误处理机制
-- **Node.js**: JavaScript运行时环境，运行服务器端代码
-  - 异步I/O操作
-  - 事件驱动架构
-- **JWT (JSON Web Token)**: 用于用户认证和授权
-  - 无状态认证机制
-  - 安全的信息传输
-  - 基于Token的用户会话管理
+3. **任务装备与执行交互**
+   - 支持将任务从任务仓库拖动到每日任务槽
+   - 提供装备/卸下任务的功能
+   - 任务完成时提供奖励反馈
 
-### 前端技术
-- **React**: 前端JavaScript库，构建用户界面
-  - 组件化架构
-  - 虚拟DOM
-  - 单向数据流
-- **React Router**: 客户端路由管理
-  - 声明式路由
-  - 嵌套路由
-  - 路由保护
-- **Context API**: 状态管理
-  - 全局状态共享
-  - 避免prop drilling
-- **Tailwind CSS**: 实用优先的CSS框架
-  - 原子化CSS类
-  - 响应式设计
-  - 主题定制
-- **Axios**: 基于Promise的HTTP客户端
-  - 请求/响应拦截
-  - 错误处理
-  - 请求取消
+4. **任务仓库的设计**
+   - 存储尚未装备的任务卡
+   - 支持任务归类、排序、搜索和预览
 
-## 功能详解
+## 技术实现
 
-### 用户认证系统
-- **注册**: 新用户可以创建账号
-  - 用户名、邮箱和密码验证
-  - 密码加密存储
-- **登录**: 已注册用户可以登录
-  - JWT认证
-  - 安全的会话管理
-- **个人资料**: 用户可以查看和编辑个人信息
+### 后端修改
 
-### 任务管理系统
-- **任务创建**: 用户可以创建新任务
-  - 设置标题、描述、优先级和截止日期
-  - 自定义奖励(经验值和金币)
-- **任务列表**: 查看所有任务
-  - 按状态、优先级等筛选
-  - 排序功能
-- **任务详情**: 查看单个任务的详细信息
-- **任务编辑**: 修改任务信息
-- **任务完成**: 标记任务为已完成
-  - 自动奖励经验值和金币
-- **任务删除**: 删除不需要的任务
+#### 1. 任务模型扩展 (server/models/Task.js)
 
-### 游戏化元素
-- **经验值系统**: 完成任务获得经验值
-- **金币系统**: 完成任务获得金币奖励
-- **进度追踪**: 任务完成率统计
-- **成就系统**: 基于用户活动的成就解锁
+扩展了Task模型，添加了以下字段：
 
-### AI功能展示
-- **智能任务推荐**: 基于用户习惯推荐任务
-- **任务优先级建议**: AI分析帮助用户确定任务优先级
-- **学习模式建议**: 基于用户数据提供学习建议
+- `type`: 任务类型（短期/长期）
+- `category`: 任务分类
+- `equipped`: 是否已装备到任务槽
+- `slotPosition`: 任务槽位置
+- `subTasks`: 长期任务的子任务数组
 
-## API端点详解
+```javascript
+// 子任务模型架构
+const subTaskSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  status: {
+    type: String,
+    enum: ['待完成', '进行中', '已完成'],
+    default: '待完成',
+  },
+  dueDate: {
+    type: Date,
+  },
+  completedAt: {
+    type: Date,
+  },
+});
 
-### 用户相关
-- `POST /api/users/register` - 用户注册
-  - 请求体: `{ username, email, password }`
-  - 响应: 用户信息和JWT token
-- `POST /api/users/login` - 用户登录
-  - 请求体: `{ email, password }`
-  - 响应: 用户信息和JWT token
-- `GET /api/users/profile` - 获取用户资料
-  - 请求头: `Authorization: Bearer <token>`
-  - 响应: 用户详细信息
-- `PUT /api/users/profile` - 更新用户资料
-  - 请求头: `Authorization: Bearer <token>`
-  - 请求体: `{ username, email, password }`
-  - 响应: 更新后的用户信息
-
-### 任务相关
-- `GET /api/tasks` - 获取当前用户的所有任务
-  - 请求头: `Authorization: Bearer <token>`
-  - 响应: 任务列表
-- `POST /api/tasks` - 创建新任务
-  - 请求头: `Authorization: Bearer <token>`
-  - 请求体: `{ title, description, priority, dueDate, experienceReward, goldReward }`
-  - 响应: 创建的任务信息
-- `GET /api/tasks/:id` - 获取单个任务详情
-  - 请求头: `Authorization: Bearer <token>`
-  - 响应: 任务详细信息
-- `PUT /api/tasks/:id` - 更新任务
-  - 请求头: `Authorization: Bearer <token>`
-  - 请求体: `{ title, description, status, priority, dueDate, experienceReward, goldReward }`
-  - 响应: 更新后的任务信息
-- `DELETE /api/tasks/:id` - 删除任务
-  - 请求头: `Authorization: Bearer <token>`
-  - 响应: 删除确认信息
-
-## 安装与运行详解
-
-### 环境要求
-- Node.js (v14+)
-- MongoDB (v4+)
-- npm或yarn
-
-### 后端设置
-```bash
-# 进入后端目录
-cd server
-
-# 安装依赖
-npm install
-
-# 启动服务器
-npm start
+// 任务模型架构
+const taskSchema = new mongoose.Schema(
+  {
+    // 原有字段...
+    type: {
+      type: String,
+      enum: ['短期', '长期'],
+      default: '短期',
+    },
+    status: {
+      type: String,
+      enum: ['待完成', '进行中', '已完成', '过期'],
+      default: '待完成',
+    },
+    category: {
+      type: String,
+      trim: true,
+      default: '默认',
+    },
+    equipped: {
+      type: Boolean,
+      default: false,
+    },
+    slotPosition: {
+      type: Number,
+      default: -1, // -1表示未装备到任务槽
+    },
+    subTasks: [subTaskSchema], // 长期任务的子任务
+  },
+  {
+    timestamps: true,
+  }
+);
 ```
 
-### 前端设置
-```bash
-# 进入前端目录
-cd client
+#### 2. 任务控制器扩展 (server/controllers/taskController.js)
 
-# 安装依赖
-npm install
+添加了以下API端点：
 
-# 启动开发服务器
-npm start
+- `getEquippedTasks`: 获取已装备的任务
+- `equipTask`: 装备任务到任务槽
+- `unequipTask`: 卸下已装备的任务
 
-## 项目扩展方向
+同时，更新了现有的API端点以支持新字段：
 
-### 功能扩展
-- 社交功能: 好友系统、任务分享
-- 团队协作: 团队任务、角色分配
-- 高级统计: 详细的任务完成分析、时间追踪
-- 通知系统: 邮件提醒、浏览器通知
+- `createTask`: 支持创建带有类型、分类和子任务的任务
+- `updateTask`: 支持更新任务的类型、分类、装备状态和子任务
 
-### 技术扩展
-- TypeScript集成: 类型安全
-- Redux状态管理: 更复杂的状态处理
-- 单元测试: Jest, React Testing Library
-- CI/CD流程: 自动化测试和部署
-- 容器化: Docker部署
+#### 3. 路由配置更新 (server/routes/taskRoutes.js)
 
-## 贡献指南
+添加了新的路由：
 
-1. Fork项目
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 创建Pull Request
+```javascript
+// 获取已装备的任务
+router.route('/equipped')
+  .get(getEquippedTasks);
 
+// 装备任务到任务槽
+router.route('/:id/equip')
+  .put(equipTask);
+
+// 卸下已装备的任务
+router.route('/:id/unequip')
+  .put(unequipTask);
+```
+
+### 前端修改
+
+#### 1. 任务服务扩展 (client/src/services/taskService.js)
+
+添加了新的API调用方法：
+
+- `getEquippedTasks`: 获取已装备的任务
+- `equipTask`: 装备任务到任务槽
+- `unequipTask`: 卸下已装备的任务
+
+#### 2. 任务卡组件更新 (client/src/components/TaskCard.js)
+
+更新了TaskCard组件，添加了对新字段和功能的支持：
+
+- 显示任务类型（短期/长期）
+- 显示任务分类
+- 显示子任务（如果有）
+- 添加装备/卸下按钮
+- 支持拖拽功能
+
+#### 3. 新组件创建
+
+创建了以下新组件：
+
+- **DailyTaskSlots.js**: 用于展示每日任务槽
+  - 显示3个任务槽
+  - 支持拖放任务到任务槽
+  - 支持卸下已装备的任务
+
+- **TaskChain.js**: 用于展示长期任务链
+  - 按状态分组显示长期任务
+  - 显示子任务进度条
+  - 使用连接线展示任务链关系
+
+- **TaskRepository.js**: 用于展示任务仓库
+  - 显示未装备的任务
+  - 支持按标题搜索、按分类和类型过滤
+  - 支持排序功能
+  - 支持拖拽任务到任务槽
+
+- **TaskForm.js**: 用于创建和编辑任务
+  - 支持设置任务类型、分类、优先级等属性
+  - 对于长期任务，支持添加和删除子任务
+  - 表单验证功能
+
+#### 4. 任务页面更新 (client/src/pages/TasksPage.js)
+
+完全重写了TasksPage组件，整合了所有新组件：
+
+- 添加标签导航，支持切换不同视图（每日任务、长期任务链、任务仓库）
+- 使用TaskForm组件替代原有的表单
+- 添加成功消息提示
+- 实现任务装备、卸下和拖放功能
+
+## 使用说明
+
+### 创建任务
+
+1. 点击"创建新任务"按钮
+2. 填写任务信息，包括标题、描述、类型、优先级、分类等
+3. 如果是长期任务，可以添加子任务
+4. 点击"创建任务"按钮提交
+
+### 管理任务
+
+1. **每日任务视图**
+   - 查看已装备的任务
+   - 将任务从仓库拖放到任务槽
+   - 点击"装备"按钮将任务装备到空闲的任务槽
+   - 点击"卸下"按钮将任务从任务槽卸下
+
+2. **长期任务链视图**
+   - 查看所有长期任务，按状态分组
+   - 查看子任务进度
+
+3. **任务仓库视图**
+   - 查看所有未装备的任务
+   - 使用搜索、过滤和排序功能找到特定任务
+   - 将任务拖放到任务槽
+
+### 任务操作
+
+- 点击"完成"按钮标记任务为已完成
+- 点击"编辑"按钮修改任务信息
+- 点击"删除"按钮删除任务
+
+## 启动应用
+
+1. 启动后端服务器
+   ```
+   cd server
+   npm run dev
+   ```
+
+2. 启动前端应用
+   ```
+   cd client
+   npm start
+   ```
+
+## 注意事项
+
+- 每日任务槽限制为3个，如果所有槽位已满，需要先卸下一个任务才能装备新任务
+- 长期任务需要至少添加一个子任务
+- 任务完成后会获得经验值和金币奖励
